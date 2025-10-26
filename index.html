@@ -1,0 +1,335 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>WorkHours Pro — Local (no Drive)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: linear-gradient(180deg,#0b1220 0%, #071428 100%);
+  --card: rgba(255,255,255,0.03);
+  --muted: #9aa8bf;
+  --accent: #60a5fa;
+  --accent-2: #7c3aed;
+  --glass: rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+html,body{height:100%;margin:0;color:#e6eef8;background:var(--bg)}
+.app{max-width:1100px;margin:28px auto;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#021226}
+h1{font-size:18px;margin:0}
+.tag{color:var(--muted);font-size:13px}
+.top-controls{display:flex;gap:10px;align-items:center}
+.btn{padding:9px 12px;border-radius:10px;border:none;background:rgba(255,255,255,0.04);color:inherit;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021226;font-weight:700}
+.main{display:grid;grid-template-columns:280px 1fr;gap:18px;margin-top:18px}
+.sidebar{backdrop-filter:blur(8px);background:var(--card);padding:16px;border-radius:12px}
+.profile{display:flex;gap:12px;align-items:center}
+.avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#1f2a44,#102034);display:flex;align-items:center;justify-content:center;font-weight:700}
+.nav{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.nav button{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:transparent;border:none;color:var(--muted);cursor:pointer}
+.nav button.active{background:linear-gradient(90deg, rgba(96,165,250,0.08), rgba(124,58,237,0.06));color:#e6eef8}
+.card{backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px}
+.form-row{display:flex;gap:8px;margin-bottom:8px}
+input,select{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;width:100%;outline:none}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03);text-align:left;font-size:13px}
+.small{font-size:13px;color:var(--muted)}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));}
+@media (max-width:980px){.main{grid-template-columns:1fr}.sidebar{order:2}}
+.theme-toggle{display:flex;gap:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <div class="logo">WH</div>
+      <div>
+        <h1>WorkHours Pro</h1>
+        <div class="tag">Local mode — Google sign-in (identity only), data stored in browser</div>
+      </div>
+    </div><div class="top-controls">
+  <div id="user-info" class="small">Not signed in</div>
+  <button id="gsiBtn" class="btn">Sign in with Google</button>
+  <button id="signoutBtn" class="btn" style="display:none">Sign out</button>
+</div>
+
+  </div>  <div class="main">
+    <aside class="sidebar card">
+      <div class="profile">
+        <div class="avatar" id="avatar">U</div>
+        <div>
+          <div id="emailDisplay" style="font-weight:700">Guest</div>
+          <div class="small muted">Local storage per user</div>
+        </div>
+      </div><nav class="nav">
+    <button class="active" data-view="dashboard">Dashboard</button>
+    <button data-view="entries">All Entries</button>
+    <button data-view="monthly">Monthly</button>
+    <button data-view="settings">Settings</button>
+  </nav>
+
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button id="exportBtn" class="btn">Export</button>
+    <button id="importFileBtn" class="btn">Import</button>
+  </div>
+
+  <div style="margin-top:12px" class="small muted">Tip: Sign-in only used to separate users locally. No Drive access required.</div>
+</aside>
+
+<section>
+  <div id="view-dashboard" class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <h3 style="margin:0">Add shift</h3>
+        <div class="small muted">Add / edit shifts — overnight shifts handled automatically</div>
+      </div>
+      <div>
+        <label class="small muted">Theme</label>
+        <div class="theme-toggle"><select id="themeSelect"><option value="dark">Dark</option><option value="light">Light</option><option value="office">Office</option></select></div>
+      </div>
+    </div>
+
+    <hr style="opacity:0.06;margin:12px 0">
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:14px">
+      <div>
+        <form id="entryForm">
+          <div class="form-row">
+            <div style="flex:1">
+              <label>Date</label>
+              <input type="date" id="date" required />
+            </div>
+            <div style="width:140px">
+              <label>Type</label>
+              <select id="type"><option value="day">Day</option><option value="night">Night</option></select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div style="flex:1">
+              <label>Start</label>
+              <input type="time" id="start" required />
+            </div>
+            <div style="width:140px">
+              <label>End</label>
+              <input type="time" id="end" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div style="flex:1">
+              <label>Paid?</label>
+              <select id="paid"><option value="no">No</option><option value="yes">Yes</option></select>
+            </div>
+            <div style="width:120px">
+              <label>Adj (hrs)</label>
+              <input id="adj" type="number" step="0.1" value="0" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="submit" class="btn primary">Save shift</button>
+            <button type="button" id="clearBtn" class="btn">Clear</button>
+          </div>
+        </form>
+
+        <div style="margin-top:12px">
+          <h4 style="margin:0">Recent entries</h4>
+          <div id="entriesWrap" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="card">
+          <h4 style="margin:0">Weekly summary</h4>
+          <div style="margin-top:10px" class="summary">
+            <div class="tile">Total hours<br><div id="totalHours" style="font-weight:700;font-size:18px">0</div></div>
+            <div class="tile">Unpaid hours<br><div id="unpaidHours" style="font-weight:700;font-size:18px">0</div></div>
+            <div class="tile">Deduction<br><div id="deduction" style="font-weight:700;font-size:18px">0</div></div>
+            <div class="tile">Est. pay<br><div id="payEstimate" style="font-weight:700;font-size:18px">0</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <label class="small muted">Hourly rate (₹)</label>
+            <input id="rate" type="number" value="120" />
+          </div>
+
+          <div style="margin-top:10px">
+            <label class="small muted">Advance taken (₹)</label>
+            <input id="advance" type="number" value="0" />
+          </div>
+
+          <canvas id="weeklyChart" height="120" style="margin-top:12px"></canvas>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4 style="margin:0">Quick rules</h4>
+          <div style="margin-top:8px" class="small muted">
+            <label>Deduction rule</label>
+            <select id="deductionRule">
+              <option value="remaining">Deduct missing hours to reach 12h per duty</option>
+              <option value="proportion">Pay proportionately for worked hours (no deduction)</option>
+              <option value="none">No deduction</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="view-entries" class="card" style="display:none;margin-top:12px">
+    <h3 style="margin:0">All entries</h3>
+    <div id="entriesTable" style="margin-top:12px"></div>
+  </div>
+
+  <div id="view-monthly" class="card" style="display:none;margin-top:12px">
+    <h3 style="margin:0">Monthly</h3>
+    <div style="margin-top:10px">
+      <label>Month</label>
+      <input type="month" id="monthSelect" />
+      <div id="monthlyReport" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div id="view-settings" class="card" style="display:none;margin-top:12px">
+    <h3 style="margin:0">Settings</h3>
+    <div style="margin-top:10px">
+      <label>Branding / Title</label>
+      <input id="brandTitle" type="text" value="WorkHours Pro" />
+      <div style="margin-top:8px" class="small muted">This changes header title. Data stays local.</div>
+    </div>
+  </div>
+
+</section>
+
+  </div>
+</div><!-- Google Identity Services (for sign-in only) --><script src="https://accounts.google.com/gsi/client" async defer></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>
+// SINGLE-FILE LOCAL VERSION
+// - Google sign-in used only for identity (no Drive scopes)
+// - All data stored in localStorage under key for the user's email (or 'guest')
+
+const STORAGE_PREFIX = 'wh_local_v1_';
+let userEmail = 'guest';
+let userName = 'Guest';
+let entries = []; // {id,date,start,end,hours,type,paid,adj}
+let editingId = null;
+let weeklyChart = null;
+
+// Helpers
+function uid(){ return 'id_' + Math.random().toString(36).slice(2,9); }
+function hoursBetween(startStr,endStr){ if(!startStr||!endStr) return 0; const [sh,sm]=startStr.split(':').map(Number); const [eh,em]=endStr.split(':').map(Number); const s=new Date(); s.setHours(sh,sm,0,0); const e=new Date(); e.setHours(eh,em,0,0); if(e<=s) e.setDate(e.getDate()+1); return Math.round(((e-s)/1000/3600 + Number.EPSILON)*100)/100; }
+function saveLocal(){ localStorage.setItem(STORAGE_PREFIX + userEmail, JSON.stringify({entries,meta:{name:userName,updated:new Date().toISOString()}})); }
+function loadLocal(){ const d = localStorage.getItem(STORAGE_PREFIX + userEmail); if(d){ try{ const parsed = JSON.parse(d); entries = parsed.entries || []; }catch(e){ entries = []; } } else entries = []; }
+
+// UI refs
+const gsiBtn = document.getElementById('gsiBtn');
+const signoutBtn = document.getElementById('signoutBtn');
+const userInfo = document.getElementById('user-info');
+const emailDisplay = document.getElementById('emailDisplay');
+const avatar = document.getElementById('avatar');
+
+// GSI init (identity only)
+let tokenClient;
+function initGSI(){
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: 'REPLACE_WITH_YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com',
+    scope: 'openid email profile',
+    callback: (resp) => {
+      if(resp.error){ console.error(resp); alert('Auth error'); return; }
+      // get userinfo from id_token
+      const id_token = resp.id_token;
+      const payload = parseJwt(id_token);
+      userEmail = payload.email || 'guest';
+      userName = payload.name || userEmail.split('@')[0];
+      onSignedIn();
+    }
+  });
+}
+
+function parseJwt (token) {
+  try{
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }catch(e){ return {}; }
+}
+
+// Sign-in handlers
+gsiBtn.addEventListener('click', ()=>{
+  // request an id token
+  if(window.google && tokenClient){ tokenClient.requestAccessToken({prompt:'consent'}); }
+  else alert('Google Identity not loaded.');
+});
+signoutBtn.addEventListener('click', ()=>{ signOut(); });
+
+function onSignedIn(){
+  document.getElementById('user-info').innerText = userEmail;
+  emailDisplay.innerText = userEmail;
+  avatar.innerText = (userName||'U').slice(0,1).toUpperCase();
+  gsiBtn.style.display = 'none'; signoutBtn.style.display = 'inline-block';
+  loadLocal(); renderAll(); }
+
+function signOut(){ userEmail = 'guest'; userName='Guest'; entries=[]; saveLocal(); document.getElementById('user-info').innerText = 'Not signed in'; emailDisplay.innerText='Guest'; avatar.innerText='U'; gsiBtn.style.display='inline-block'; signoutBtn.style.display='none'; renderAll(); }
+
+// Form
+const entryForm = document.getElementById('entryForm');
+entryForm.addEventListener('submit', e=>{ e.preventDefault(); const d=document.getElementById('date').value; const s=document.getElementById('start').value; const en=document.getElementById('end').value; const type=document.getElementById('type').value; const paid=document.getElementById('paid').value; const adj=Number(document.getElementById('adj').value||0); if(!d||!s||!en) return alert('Enter date, start and end'); const hrs = hoursBetween(s,en) + adj; if(editingId){ const idx=entries.findIndex(x=>x.id===editingId); if(idx>-1){ entries[idx]= {...entries[idx], date:d, start:s, end:en, hours:Math.round((hrs+Number.EPSILON)*100)/100, type, paid, adj}; editingId=null; } } else { entries.push({id:uid(),date:d,start:s,end:en,hours:Math.round((hrs+Number.EPSILON)*100)/100,type,paid,adj}); } saveLocal(); entryForm.reset(); renderAll(); });
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{ entryForm.reset(); editingId=null; });
+
+// Render
+function renderAll(){ renderEntries(); renderEntriesTable(); recalcAndRender(); }
+function renderEntries(){ const wrap=document.getElementById('entriesWrap'); const recent = entries.slice().sort((a,b)=> new Date(b.date)-new Date(a.date)).slice(0,8); if(recent.length===0){ wrap.innerHTML='<div class="small">No entries yet.</div>'; return; } let html='<table><thead><tr><th>Date</th><th>Start</th><th>End</th><th>Hrs</th><th>Paid</th><th></th></tr></thead><tbody>'; recent.forEach(e=>{ html+=`<tr><td>${e.date}</td><td>${e.start}</td><td>${e.end}</td><td>${e.hours}</td><td>${e.paid}</td><td><button class="btn" onclick="editEntry('${e.id}')">Edit</button> <button class="btn" onclick="deleteEntry('${e.id}')">Del</button></td></tr>`; }); html+='</tbody></table>'; wrap.innerHTML=html; }
+
+function renderEntriesTable(){ const wrap=document.getElementById('entriesTable'); if(entries.length===0){ wrap.innerHTML='<div class="small">No entries yet.</div>'; return; } let html='<table><thead><tr><th>Date</th><th>Type</th><th>Start</th><th>End</th><th>Hrs</th><th>Paid</th><th>Actions</th></tr></thead><tbody>'; entries.slice().sort((a,b)=> new Date(b.date)-new Date(a.date)).forEach(e=>{ html+=`<tr><td>${e.date}</td><td>${e.type}</td><td>${e.start}</td><td>${e.end}</td><td>${e.hours}</td><td>${e.paid}</td><td><button class="btn" onclick="editEntry('${e.id}')">Edit</button> <button class="btn" onclick="deleteEntry('${e.id}')">Del</button></td></tr>`; }); html+='</tbody></table>'; wrap.innerHTML=html; }
+
+window.editEntry = function(id){ const e=entries.find(x=>x.id===id); if(!e) return; document.getElementById('date').value=e.date; document.getElementById('start').value=e.start; document.getElementById('end').value=e.end; document.getElementById('type').value=e.type; document.getElementById('paid').value=e.paid; document.getElementById('adj').value=e.adj||0; editingId=id; }
+window.deleteEntry = function(id){ if(!confirm('Delete this entry?')) return; entries=entries.filter(x=>x.id!==id); saveLocal(); renderAll(); }
+
+// Summary & rules
+function getCurrentWeekDates(){ const now=new Date(); const day=now.getDay(); const diffToMon=(day+6)%7; const mon=new Date(now); mon.setDate(now.getDate()-diffToMon); mon.setHours(0,0,0,0); const sun=new Date(mon); sun.setDate(mon.getDate()+6); sun.setHours(23,59,59,999); return [mon,sun]; }
+function recalcAndRender(){ const rate=Number(document.getElementById('rate').value||0); const adv=Number(document.getElementById('advance').value||0); const rule=document.getElementById('deductionRule').value; const [mon,sun]=getCurrentWeekDates(); const weekEntries=entries.filter(e=>{ const d=new Date(e.date); return d>=mon && d<=sun; }); let total=0, unpaid=0, deduction=0; if(rule==='remaining'){ weekEntries.forEach(e=>{ total+=Number(e.hours||0); deduction+=Math.max(0,12 - Number(e.hours||0)); if(e.paid==='no') unpaid+=Number(e.hours||0); }); } else if(rule==='proportion'){ weekEntries.forEach(e=>{ total+=Number(e.hours||0); if(e.paid==='no') unpaid+=Number(e.hours||0); }); deduction=0; } else { weekEntries.forEach(e=>{ total+=Number(e.hours||0); if(e.paid==='no') unpaid+=Number(e.hours||0); }); deduction=0; }
+ const payableHours=Math.max(0,total - deduction);
+ const payEstimate=Math.round((payableHours * rate) - adv);
+ document.getElementById('totalHours').innerText=total.toFixed(2);
+ document.getElementById('unpaidHours').innerText=unpaid.toFixed(2);
+ document.getElementById('deduction').innerText=deduction.toFixed(2);
+ document.getElementById('payEstimate').innerText=payEstimate;
+ updateChart(); }
+
+// Chart
+function initChart(){ const ctx=document.getElementById('weeklyChart').getContext('2d'); weeklyChart = new Chart(ctx,{ type:'bar', data:{ labels:[], datasets:[{label:'Hours', data:[]}] }, options:{ responsive:true, scales:{ y:{ beginAtZero:true } } } }); updateChart(); }
+function updateChart(){ const [mon] = getCurrentWeekDates(); const labels=[]; const data=[]; for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); labels.push(d.toLocaleDateString()); const sum = entries.filter(e=> new Date(e.date).toDateString()===d.toDateString()).reduce((s,x)=>s+Number(x.hours||0),0); data.push(sum); } weeklyChart.data.labels=labels; weeklyChart.data.datasets[0].data=data; weeklyChart.update(); }
+
+// Monthly
+document.getElementById('monthSelect').addEventListener('change', ()=>{ const val=document.getElementById('monthSelect').value; if(!val) return; const [y,m]=val.split('-').map(Number); const start=new Date(y,m-1,1); const end=new Date(y,m,0); const monthEntries=entries.filter(e=>{ const d=new Date(e.date); return d>=start && d<=end; }); const total=monthEntries.reduce((s,x)=>s+Number(x.hours||0),0); let html=`<div class="small">Entries: ${monthEntries.length}</div><div style="margin-top:8px">Total hours: <strong>${total.toFixed(2)}</strong></div>`; document.getElementById('monthlyReport').innerHTML=html; });
+
+// Export / Import (local file)
+document.getElementById('exportBtn').addEventListener('click', ()=>{ const blob=new Blob([JSON.stringify({entries,meta:{user:userEmail,updated:new Date().toISOString()}},null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='workhours_export.json'; a.click(); URL.revokeObjectURL(url); });
+
+document.getElementById('importFileBtn').addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=(ev)=>{ try{ const parsed=JSON.parse(ev.target.result); if(parsed.entries) entries = parsed.entries; else if(Array.isArray(parsed)) entries = parsed; else return alert('Invalid file'); saveLocal(); renderAll(); alert('Imported'); }catch(err){ alert('Import failed'); } }; reader.readAsText(f); }; inp.click(); });
+
+// Theme select
+const themeSelect = document.getElementById('themeSelect'); themeSelect.addEventListener('change', ()=>{ const v=themeSelect.value; if(v==='light'){ document.body.style.background='linear-gradient(180deg,#f8fafc,#eef2ff)'; document.body.style.color='#0b1220'; } else if(v==='office'){ document.body.style.background='linear-gradient(180deg,#f4f7fb,#e8eef6)'; document.body.style.color='#0b1220'; } else { document.body.style.background='linear-gradient(180deg,#0b1220,#071428)'; document.body.style.color='#e6eef8'; } });
+
+// Nav
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click', e=>{ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active')); e.currentTarget.classList.add('active'); const v=e.currentTarget.dataset.view; document.getElementById('view-dashboard').style.display='none'; document.getElementById('view-entries').style.display='none'; document.getElementById('view-monthly').style.display='none'; document.getElementById('view-settings').style.display='none'; document.getElementById('view-'+v).style.display='block'; }));
+
+// Branding/title change
+document.getElementById('brandTitle').addEventListener('input', (e)=>{ document.querySelector('.brand h1').innerText = e.target.value || 'WorkHours Pro'; });
+
+// Init on load
+window.onload = ()=>{ initGSI(); loadLocal(); renderAll(); initChart(); if(userEmail==='guest'){ document.getElementById('user-info').innerText='Not signed in'; } };
+
+</script></body>
+</html>
